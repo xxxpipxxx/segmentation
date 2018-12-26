@@ -95,13 +95,39 @@ axis(2, at=c(1, 2), labels=levels(seg.df$gender)) # label axis y based on gender
 ##  Means based Clustering : K- Means ###########
 #################################################
 
+### attempts to find groups that are most compact in terms of the mean sum of squres away from the centroid of each group
+# as uses means it needs numerical data - we have mixed data. 
+# Is not an ideal solution, and should be done with care, but we can binaries our categories to 1 and 0
+# This example alrady uses binary categories but we can also create dummy variables where we turn levels into seperate yes no 1,0 variables.
 
+## HOWEVER this is often not satisfactory and is so needs caution to be exercised## consider ROCK type linked clustering instead
+# but lets give it a go :)
 
+# recode variables to 1,0 numrerics where categorical
+seg.df.num <- seg.df
+seg.df.num$gender <- ifelse(seg.df$gender=="Male", 0, 1)
+seg.df.num$ownHome <- ifelse(seg.df$ownHome=="ownNo", 0, 1)
+seg.df.num$subscribe <- ifelse(seg.df$subscribe=="subNo", 0, 1)
 
+ 
+set.seed(96743) # for reproducibilty
+seg.k <- kmeans(seg.df.num, centers=4) # set 4 clusters
 
+# use summary fuction we created
 
+seg.sum(seg.df.num, seg.k$cluster) ## notice here we no longer have the M/F Split
 
+boxplot(seg.df.num$income ~ seg.k$cluster, ylab="Income", xlab="Cluster") # nice spit on income
 
+## visualise using a PCA
 
+#(see Chap. 8 to review principal component analysis and plotting.)
+#We use clusplot from the cluster package with arguments to color the groups,
+#shade the ellipses for group membership, label only the groups (not the individual points) with labels=4,
+# and omit distance lines between groups (lines=0):
+  
+
+library(cluster)
+clusplot(seg.df, seg.k$cluster, color=TRUE, shade=TRUE, labels=4, lines=0, main="K-means cluster plot")
 
 
